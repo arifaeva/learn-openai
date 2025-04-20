@@ -1,7 +1,8 @@
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
 import json
+import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 
@@ -9,8 +10,10 @@ API_KEY = os.getenv("OPENAI_API_KEY")
 
 client = OpenAI(api_key=API_KEY)
 
+
 def multiply(a, b):
     return a * b
+
 
 messages = [{"role": "user", "content": "What is 3834.2345 multiplied by 3895.452 ?"}]
 
@@ -23,20 +26,14 @@ tools = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "a": {
-                        "type": "number",
-                        "description": "First value of argument"
-                    },
-                    "b": {
-                        "type": "number",
-                        "description": "Second value of argument"
-                    },
+                    "a": {"type": "number", "description": "First value of argument"},
+                    "b": {"type": "number", "description": "Second value of argument"},
                 },
                 "required": ["a", "b"],
-                "additionalProperties": False
+                "additionalProperties": False,
             },
-            "strict": True
-        }
+            "strict": True,
+        },
     }
 ]
 
@@ -54,18 +51,18 @@ tool_result = multiply(args["a"], args["b"])
 # print(args)
 # print(tool_result)
 
-messages.append({
-    "role": "function",
-    "name": tool_call.function.name,
-    "content": json.dumps(tool_result)
-})
+messages.append(
+    {
+        "role": "function",
+        "name": tool_call.function.name,
+        "content": json.dumps(tool_result),
+    }
+)
 
 messages.append(response.choices[0].message)
-messages.append({
-    "role": "tool",
-    "tool_call_id": tool_call.id,
-    "content": str(tool_result)
-})
+messages.append(
+    {"role": "tool", "tool_call_id": tool_call.id, "content": str(tool_result)}
+)
 
 response = client.chat.completions.create(
     model="gpt-4o-mini", messages=messages, tools=tools

@@ -1,12 +1,15 @@
 import os
-from openai import OpenAI
+
 from dotenv import load_dotenv
+from openai import OpenAI
 from pydantic import BaseModel
+
 
 class FoodRecipe(BaseModel):
     dish_name: list[str]
     ingredients: list[str]
     cooking_steps: list[str]
+
 
 load_dotenv()
 
@@ -17,9 +20,7 @@ client = OpenAI(api_key=API_KEY)
 messages = [{"role": "user", "content": "Tell me how to make Nasi Goreng"}]
 
 response = client.beta.chat.completions.parse(
-    model="gpt-4o-mini",
-    messages=messages,
-    response_format=FoodRecipe
+    model="gpt-4o-mini", messages=messages, response_format=FoodRecipe
 )
 
 parsed_output = response.choices[0].message.parsed.dict()
